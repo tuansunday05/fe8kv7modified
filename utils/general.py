@@ -706,7 +706,7 @@ def box_iou_for_nms(box1, box2, GIoU=False, DIoU=False, CIoU=False, SIoU=False, 
 
     # IoU
     iou = inter / union
-    if CIoU or DIoU or GIoU or EIou:
+    if CIoU or DIoU or GIoU or EIou or SIoU:
         cw = b1_x2.maximum(b2_x2) - b1_x1.minimum(b2_x1)  # convex (smallest enclosing box) width
         ch = b1_y2.maximum(b2_y2) - b1_y1.minimum(b2_y1)  # convex height
         if CIoU or DIoU or EIou:  # Distance or Complete IoU https://arxiv.org/abs/1911.08287v1
@@ -854,8 +854,8 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
         # Batched NMS
         c = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
         boxes, scores = x[:, :4] + c, x[:, 4]  # boxes (offset by class), scores
-        # i = torchvision.ops.nms(boxes, scores, iou_thres)  # NMS
-        i = soft_nms(boxes, scores, iou_thres) 
+        i = torchvision.ops.nms(boxes, scores, iou_thres)  # NMS
+        # i = soft_nms(boxes, scores, iou_thres) 
         if i.shape[0] > max_det:  # limit detections
             i = i[:max_det]
         if merge and (1 < n < 3E3):  # Merge NMS (boxes merged using weighted mean)
